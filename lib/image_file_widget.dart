@@ -121,23 +121,30 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
 
   uploadFile() async {
     var imageFile = widget.imageFile;
+
+    if (!imageFile.android && !imageFile.iOS) {
+      return;
+    }
+
     if (!imageFile.isUploading()) {
       imageFile.setUploading();
     }
 
     setState(() {});
 
-    String url = "http://192.168.1.101:8080/ImageUploadDemo/image-resizer";
+    String url = "http://192.168.1.100:8080/ImageUploadDemo/image-resizer";
 
     Dio dio = new Dio();
+/*
 
     var response = await dio.post(
       url,
       options: Options(responseType: ResponseType.bytes),
       data: FormData.fromMap({
-        "android" : "true",
-        "ios" : "true",
-        "file": http.MultipartFile.fromBytes("file", imageFile.fileBytes,
+        "android" : false,
+        "ios" : true,
+        "file": http.MultipartFile.fromBytes("file",imageFile.fileBytes,
+            contentType: MediaType('image', '*'),
             filename: imageFile.fileName)
       }),
       onSendProgress: (int sent, int total) {
@@ -147,13 +154,16 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
       },
     );
 
+
     setState(() {
       imageFile.status = ImageFileStatus.FINISH;
     });
     saveFile(imageFile.fileName, response.data);
 
+ */
+
     // await simpleGetCall(url);
-    // await uploadFile2(url, {"Authorization" : "Basic ABCD"}, imageFile.fileName, imageFile.fileBytes);
+     await uploadFile2(url, {"Authorization" : "Basic ABCD"}, imageFile.fileName, imageFile.fileBytes);
   }
 
   Future<http.Response> uploadFile2(String url, Map<String, String> headers,
@@ -161,6 +171,9 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
     print("Url:" + url);
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("D" + fileBytes.length.toString());
+
+    request.fields["android"] = "true";
+    request.fields["iso"] = "true";
     request.files.add(
         http.MultipartFile.fromBytes('file', fileBytes, filename: fileName));
     print("C");

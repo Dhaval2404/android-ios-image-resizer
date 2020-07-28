@@ -1,12 +1,12 @@
+import 'dart:html' as html;
+
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:image_picker_web/image_picker_web.dart';
+import 'package:mime_type/mime_type.dart';
+import 'package:path/path.dart' as Path;
 
 import 'data/ImageFile.dart';
 import 'image_file_widget.dart';
-import 'package:image_picker_web/image_picker_web.dart';
-import 'dart:html' as html;
-import 'package:mime_type/mime_type.dart';
-import 'package:path/path.dart' as Path;
 
 List<ImageFile> IMAGE_FILES = <ImageFile>[];
 
@@ -24,45 +24,67 @@ class _MyHomePageState extends State<MyHomePage> {
           'Android & iOS Image Builder',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+
       ),
-      body: Container(child: _body()),
+      body: _body(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _pickImage2,
         label: Text('Pick Image'),
-        icon: Icon(Icons.add),
+        icon: Icon(Icons.photo),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
   Widget _body() {
-    return Card(
-        margin: EdgeInsets.all(48),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(6.0),
-        ),
-        child: _body2());
+    return Container(
+      child: Card(
+          margin: EdgeInsets.all(86),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6.0),
+          ),
+          child: IMAGE_FILES.isEmpty ? _emptyView() : _imageListing()),
+    );
   }
 
-  Widget _body2() {
+  Widget _emptyView() {
+    return Container(
+      color: Colors.white,
+      width: double.infinity,
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text("PICK IMAGE TO RESIZE", style: TextStyle(fontSize: 48, fontWeight: FontWeight.w600)),
+            SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 48),
+              child: Text("The page will helps you re-size your Android and iOS image assets. Upload your maximum resolution image in PNG, JPG or WEBP format, and you'll get back a .ZIP file with the image assets re-sized.",
+                  textAlign: TextAlign.justify,
+                  style: TextStyle(fontSize: 20)),
+            ),
+            SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 48),
+              child: Text("Upload a max resolution version of your static app image (xxxhdpi for Android and @3x for iOS), and we do the heavy lifting. You'll receive a .ZIP file containing the images down-sampled to the right dimensions for each of the platforms. We'll also name them correctly for you. Just because we're nice.",
+                  textAlign: TextAlign.justify,
+                  style: TextStyle(fontSize: 20)),
+            ),
+          ],
+      ),
+    );
+  }
+
+  Widget _imageListing() {
     return Container(
       color: Colors.white,
       child: ListView.builder(
-        shrinkWrap: true,
         itemCount: IMAGE_FILES.length,
         itemBuilder: (context, index) {
           return ImageFileWidget(IMAGE_FILES[index]);
         },
       ),
     );
-  }
-
-  _pickImage() async {
-    final _picker = ImagePicker();
-    final pickedFile = await _picker.getImage(source: ImageSource.gallery);
-    var bytes = await pickedFile.readAsBytes();
-    var imageFile = ImageFile(List.from(bytes), fileName: "");
-    IMAGE_FILES.add(imageFile);
-    setState(() {});
   }
 
   _pickImage2() async {
@@ -73,12 +95,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (mediaFile != null) {
       print(mediaFile.name);
-      var imageFile = ImageFile(List.from(mediaData.data), fileName: mediaFile.name);
-      IMAGE_FILES.add(imageFile);
       setState(() {
-
+        var imageFile =
+            ImageFile(List.from(mediaData.data), fileName: mediaFile.name);
+        IMAGE_FILES.add(imageFile);
       });
-    }else{
+    } else {
       print("mediaFile is null");
     }
   }
