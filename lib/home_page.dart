@@ -7,6 +7,7 @@ import 'package:path/path.dart' as Path;
 
 import 'data/ImageFile.dart';
 import 'image_file_widget.dart';
+import 'util/intent_util.dart';
 
 List<ImageFile> IMAGE_FILES = <ImageFile>[];
 
@@ -24,7 +25,19 @@ class _MyHomePageState extends State<MyHomePage> {
           'Android & iOS Image Builder',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-
+        actions: [
+          FlatButton(
+            onPressed: () {
+              IntentUtil.launchURL(
+                  "https://github.com/Dhaval2404/android-ios-image-resizer");
+            },
+            child: Text(
+              "Source on Github",
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          )
+        ],
       ),
       body: _body(),
       floatingActionButton: FloatingActionButton.extended(
@@ -52,25 +65,28 @@ class _MyHomePageState extends State<MyHomePage> {
       color: Colors.white,
       width: double.infinity,
       child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text("PICK IMAGE TO RESIZE", style: TextStyle(fontSize: 48, fontWeight: FontWeight.w600)),
-            SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 48),
-              child: Text("The page will helps you re-size your Android and iOS image assets. Upload your maximum resolution image in PNG, JPG or WEBP format, and you'll get back a .ZIP file with the image assets re-sized.",
-                  textAlign: TextAlign.justify,
-                  style: TextStyle(fontSize: 20)),
-            ),
-            SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 48),
-              child: Text("Upload a max resolution version of your static app image (xxxhdpi for Android and @3x for iOS), and we do the heavy lifting. You'll receive a .ZIP file containing the images down-sampled to the right dimensions for each of the platforms. We'll also name them correctly for you. Just because we're nice.",
-                  textAlign: TextAlign.justify,
-                  style: TextStyle(fontSize: 20)),
-            ),
-          ],
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text("PICK IMAGE TO RESIZE",
+              style: TextStyle(fontSize: 48, fontWeight: FontWeight.w600)),
+          SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 48),
+            child: Text(
+                "The page will helps you re-size your Android and iOS image assets. Upload your maximum resolution image in PNG, JPG or WEBP format, and you'll get back a .ZIP file with the image assets re-sized.",
+                textAlign: TextAlign.justify,
+                style: TextStyle(fontSize: 20)),
+          ),
+          SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 48),
+            child: Text(
+                "Upload a max resolution version of your static app image (xxxhdpi for Android and @3x for iOS), and we do the heavy lifting. You'll receive a .ZIP file containing the images down-sampled to the right dimensions for each of the platforms. We'll also name them correctly for you. Just because we're nice.",
+                textAlign: TextAlign.justify,
+                style: TextStyle(fontSize: 20)),
+          ),
+        ],
       ),
     );
   }
