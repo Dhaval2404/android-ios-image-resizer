@@ -143,9 +143,6 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
     String fileName = imageFile.fileName;
     List<int> fileBytes = imageFile.fileBytes;
 
-    var file =
-        http.MultipartFile.fromBytes('file', fileBytes, filename: fileName);
-
     Dio dio = new Dio();
     var response = await dio.post(
       AppConstant.IMAGE_RESIZER_URL,
@@ -153,7 +150,7 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
       data: FormData.fromMap({
         "android": imageFile.android,
         "ios": imageFile.iOS,
-        "file": file,
+        "file": MultipartFile.fromBytes(fileBytes, filename: fileName),
       }),
       onSendProgress: (int sent, int total) {
         setState(() {
