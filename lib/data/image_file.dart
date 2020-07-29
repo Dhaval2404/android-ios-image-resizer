@@ -1,5 +1,3 @@
-import 'package:image_picker/image_picker.dart';
-
 class ImageFile {
   bool android;
   bool iOS;

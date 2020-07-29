@@ -1,5 +1,5 @@
 import 'package:image_picker/image_picker.dart';
-import 'package:imageresizer/data/ImageFile.dart';
+import 'package:imageresizer/data/image_file.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class IntentUtil {

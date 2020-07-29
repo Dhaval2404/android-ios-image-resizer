@@ -1,13 +1,9 @@
-import 'dart:html' as html;
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker_web/image_picker_web.dart';
-import 'package:mime_type/mime_type.dart';
-import 'package:path/path.dart' as Path;
+import 'package:imageresizer/util/html_util.dart';
 
 import 'app_constant.dart';
-import 'data/ImageFile.dart';
+import 'data/image_file.dart';
 import 'image_file_widget.dart';
 import 'util/intent_util.dart';
 
@@ -19,31 +15,39 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List<Widget> _actions() {
+    return <Widget>[
+      FlatButton(
+        onPressed: () {
+          IntentUtil.launchURL(AppConstant.GITHUB_URL);
+        },
+        child: Text(
+          'action_github'.tr(),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      )
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'app_name'.tr(),
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        actions: [
-          FlatButton(
-            onPressed: () {
-              IntentUtil.launchURL(AppConstant.GITHUB_URL);
-            },
-            child: Text(
-              "Source on Github",
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          )
-        ],
+        actions: _actions(),
       ),
       body: _body(),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _pickImage2,
-        label: Text('Pick Image'),
+        onPressed: _pickImageClick,
+        label: Text('action_pick_image'.tr()),
         icon: Icon(Icons.photo),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
@@ -70,16 +74,19 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("PICK IMAGE TO RESIZE",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 48, fontWeight: FontWeight.w600)),
+          Text(
+            'empty_view_title'.tr(),
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 48, fontWeight: FontWeight.w600),
+          ),
           SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 48),
             child: Text(
-                "The page will helps you re-size your Android and iOS image assets. Upload your maximum resolution image in PNG, JPG or WEBP format, and you'll get back a .ZIP file with the image assets re-sized.",
-                textAlign: TextAlign.justify,
-                style: TextStyle(fontSize: 20)),
+              'empty_view_subtitle'.tr(),
+              textAlign: TextAlign.justify,
+              style: TextStyle(fontSize: 20),
+            ),
           )
         ],
       ),
@@ -98,17 +105,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _pickImage2() async {
-    var mediaData = await ImagePickerWeb.getImageInfo;
-    String mimeType = mime(Path.basename(mediaData.fileName));
-    html.File mediaFile =
-        new html.File(mediaData.data, mediaData.fileName, {'type': mimeType});
-
-    if (mediaFile != null) {
-      print(mediaFile.name);
+  _pickImageClick() async {
+    var imageFile = await HtmlUtil.pickImage();
+    if (imageFile != null) {
       setState(() {
-        var imageFile =
-            ImageFile(List.from(mediaData.data), fileName: mediaFile.name);
         IMAGE_FILES.add(imageFile);
       });
     }

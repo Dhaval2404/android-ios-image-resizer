@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:imageresizer/data/ImageFile.dart';
-import 'package:imageresizer/util/file_util.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:http/http.dart' as http;
-import 'dart:html' as html;
+import 'package:imageresizer/app_constant.dart';
+import 'package:imageresizer/data/image_file.dart';
+import 'package:imageresizer/util/file_util.dart';
+import 'package:imageresizer/util/html_util.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ImageFileWidget extends StatefulWidget {
   final ImageFile imageFile;
@@ -36,9 +38,7 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                      minWidth: 260,
-                      maxWidth: 260),
+                  constraints: BoxConstraints(minWidth: 260, maxWidth: 260),
                   child: Text(
                     imageFile.fileName,
                     maxLines: 1,
@@ -64,11 +64,12 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
                 lineHeight: 16.0,
                 percent: imageFile.progress / 100,
                 center: Text(
-                  imageFile.progress.toString() + "%",
+                  'upload_progress'.plural(imageFile.progress),
                   style: new TextStyle(
-                      fontSize: 12.0,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold),
+                    fontSize: 12.0,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 backgroundColor: Colors.grey,
                 progressColor: Theme.of(context).primaryColor,
@@ -80,7 +81,7 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
               child: CheckboxListTile(
                 dense: true,
                 controlAffinity: ListTileControlAffinity.leading,
-                title: const Text('Android'),
+                title: Text('platform_android'.tr()),
                 value: imageFile.android,
                 onChanged: (newValue) {
                   setState(() {
@@ -95,7 +96,7 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
               child: CheckboxListTile(
                 dense: true,
                 controlAffinity: ListTileControlAffinity.leading,
-                title: const Text('iOS'),
+                title: Text('platform_ios'.tr()),
                 value: imageFile.iOS,
                 onChanged: (newValue) {
                   setState(() {
@@ -110,7 +111,9 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6.0),
               ),
-              child: Text(imageFile.isUploading() ? "Uploading" : "Upload"),
+              child: Text(imageFile.isUploading()
+                  ? 'status_uploading'.tr()
+                  : 'status_upload'.tr()),
               onPressed: uploadFile,
             )
           ],
@@ -121,31 +124,36 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
 
   uploadFile() async {
     var imageFile = widget.imageFile;
-
     if (!imageFile.android && !imageFile.iOS) {
       return;
     }
 
     if (!imageFile.isUploading()) {
-      imageFile.setUploading();
+      setState(() {
+        imageFile.setUploading();
+      });
     }
 
-    setState(() {});
+    // await dummyGetCall();
+    // await uploadFileWithDefault(imageFile);
+    await uploadFileWithDio(imageFile);
+  }
 
-    String url = "http://192.168.1.100:8080/ImageUploadDemo/image-resizer";
+  Future uploadFileWithDio(ImageFile imageFile) async {
+    String fileName = imageFile.fileName;
+    List<int> fileBytes = imageFile.fileBytes;
+
+    var file =
+        http.MultipartFile.fromBytes('file', fileBytes, filename: fileName);
 
     Dio dio = new Dio();
-/*
-
     var response = await dio.post(
-      url,
+      AppConstant.IMAGE_RESIZER_URL,
       options: Options(responseType: ResponseType.bytes),
       data: FormData.fromMap({
-        "android" : false,
-        "ios" : true,
-        "file": http.MultipartFile.fromBytes("file",imageFile.fileBytes,
-            contentType: MediaType('image', '*'),
-            filename: imageFile.fileName)
+        "android": imageFile.android,
+        "ios": imageFile.iOS,
+        "file": file,
       }),
       onSendProgress: (int sent, int total) {
         setState(() {
@@ -154,60 +162,43 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
       },
     );
 
-
     setState(() {
       imageFile.status = ImageFileStatus.FINISH;
     });
-    saveFile(imageFile.fileName, response.data);
 
- */
-
-    // await simpleGetCall(url);
-     await uploadFile2(url, {"Authorization" : "Basic ABCD"}, imageFile.fileName, imageFile.fileBytes);
+    if (response.data != null) {
+      HtmlUtil.saveFile(fileName, response.data);
+    }
   }
 
-  Future<http.Response> uploadFile2(String url, Map<String, String> headers,
-      String fileName, List<int> fileBytes) async {
-    print("Url:" + url);
-    var request = new http.MultipartRequest("POST", Uri.parse(url));
-    print("D" + fileBytes.length.toString());
+  Future uploadFileWithDefault(ImageFile imageFile) async {
+    String fileName = imageFile.fileName;
+    List<int> fileBytes = imageFile.fileBytes;
 
-    request.fields["android"] = "true";
-    request.fields["iso"] = "true";
-    request.files.add(
-        http.MultipartFile.fromBytes('file', fileBytes, filename: fileName));
-    print("C");
-    // request.headers.addAll(headers);
-    print("B");
+    var uri = Uri.parse(AppConstant.IMAGE_RESIZER_URL);
+    var request = new http.MultipartRequest("POST", uri);
+
+    var file =
+        http.MultipartFile.fromBytes('file', fileBytes, filename: fileName);
+    request.fields["android"] = imageFile.android.toString();
+    request.fields["iso"] = imageFile.iOS.toString();
+    request.files.add(file);
+
     var streamedResponse = await request.send();
-    print("A");
     var response = await http.Response.fromStream(streamedResponse);
 
-    print("A1:" + response.bodyBytes.length.toString());
-    saveFile(fileName, response.bodyBytes);
+    setState(() {
+      imageFile.progress = 100;
+      imageFile.status = ImageFileStatus.FINISH;
+    });
 
-    return response;
+    if (response.bodyBytes != null) {
+      HtmlUtil.saveFile(fileName, response.bodyBytes);
+    }
   }
 
-  saveFile(String fileName, List<int> bytes) {
-    // prepare
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.document.createElement('a') as html.AnchorElement
-      ..href = url
-      ..style.display = 'none'
-      ..download = fileName + '.zip';
-    html.document.body.children.add(anchor);
-
-    // download
-    anchor.click();
-
-    // cleanup
-    html.document.body.children.remove(anchor);
-    html.Url.revokeObjectUrl(url);
-  }
-
-  Future simpleGetCall(String url) async {
+  Future dummyGetCall() async {
+    String url = AppConstant.IMAGE_RESIZER_URL;
     print("Url:" + url);
     var value = await http.get(url);
     print("Response:" + value.body);
