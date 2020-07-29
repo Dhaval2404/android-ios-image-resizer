@@ -1,10 +1,12 @@
 import 'dart:html' as html;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:path/path.dart' as Path;
 
+import 'app_constant.dart';
 import 'data/ImageFile.dart';
 import 'image_file_widget.dart';
 import 'util/intent_util.dart';
@@ -22,14 +24,13 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Android & iOS Image Builder',
+          'app_name'.tr(),
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           FlatButton(
             onPressed: () {
-              IntentUtil.launchURL(
-                  "https://github.com/Dhaval2404/android-ios-image-resizer");
+              IntentUtil.launchURL(AppConstant.GITHUB_URL);
             },
             child: Text(
               "Source on Github",
@@ -77,15 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 "The page will helps you re-size your Android and iOS image assets. Upload your maximum resolution image in PNG, JPG or WEBP format, and you'll get back a .ZIP file with the image assets re-sized.",
                 textAlign: TextAlign.justify,
                 style: TextStyle(fontSize: 20)),
-          ),
-          SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 48),
-            child: Text(
-                "Upload a max resolution version of your static app image (xxxhdpi for Android and @3x for iOS), and we do the heavy lifting. You'll receive a .ZIP file containing the images down-sampled to the right dimensions for each of the platforms. We'll also name them correctly for you. Just because we're nice.",
-                textAlign: TextAlign.justify,
-                style: TextStyle(fontSize: 20)),
-          ),
+          )
         ],
       ),
     );
