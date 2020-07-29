@@ -50,9 +50,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _body() {
+    var margin = MediaQuery.of(context).size.width * 0.05;
     return Container(
       child: Card(
-          margin: EdgeInsets.all(86),
+          margin: EdgeInsets.all(margin),
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(6.0),
@@ -70,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text("PICK IMAGE TO RESIZE",
+              textAlign: TextAlign.center,
               style: TextStyle(fontSize: 48, fontWeight: FontWeight.w600)),
           SizedBox(height: 12),
           Padding(
@@ -109,8 +111,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ImageFile(List.from(mediaData.data), fileName: mediaFile.name);
         IMAGE_FILES.add(imageFile);
       });
-    } else {
-      print("mediaFile is null");
     }
   }
 }
