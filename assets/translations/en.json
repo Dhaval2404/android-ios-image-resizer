@@ -4,10 +4,10 @@
   "action_pick_image":"Pick Image",
   "drag_drop_message":"Drag & Drop your image here",
   "empty_view_title":"PICK IMAGE TO RESIZE",
-  "empty_view_subtitle":"Create Android & iOS drawable/assets image online. Upload your maximum resolution image in PNG or JPG format and you will get zip file with resized image in it.".
+  "empty_view_subtitle":"Create Android & iOS drawable/assets image online. Upload your maximum resolution image in PNG or JPG format and you will get zip file with resized image in it.",
   "platform_android":"Android",
   "platform_ios":"iOS",
-  "upload_progress":"{} %",
+  "upload_progress":"{}%",
   "status_upload":"Upload",
   "status_uploading":"Uploading"
 }
