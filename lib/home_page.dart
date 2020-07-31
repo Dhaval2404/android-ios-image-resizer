@@ -15,6 +15,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
   List<Widget> _actions() {
     return <Widget>[
       FlatButton(
@@ -35,6 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           'app_name'.tr(),
@@ -108,6 +112,18 @@ class _MyHomePageState extends State<MyHomePage> {
   _pickImageClick() async {
     var imageFile = await HtmlUtil.pickImage();
     if (imageFile != null) {
+      if (!imageFile.fileName.endsWith("png") &&
+          !imageFile.fileName.endsWith("jpg") &&
+          !imageFile.fileName.endsWith("jpeg") &&
+          !imageFile.fileName.endsWith("jfif")) {
+
+        print(imageFile.fileName);
+        final snackBar = SnackBar(content: Text('Only PNG and JPG images are supported!'));
+        _scaffoldKey.currentState.showSnackBar(snackBar);
+
+        return;
+      }
+
       setState(() {
         IMAGE_FILES.add(imageFile);
       });
