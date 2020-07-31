@@ -1,15 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-
 import 'home_page.dart';
 
 void main() {
   runApp(
     EasyLocalization(
-        supportedLocales: [Locale('en')],
-        path: 'assets/translations', // <-- change patch to your
-        fallbackLocale: Locale('en'),
-        child: MyApp()
+      supportedLocales: [Locale('en')],
+      path: 'assets/translations', // <-- change patch to your
+      fallbackLocale: Locale('en'),
+      child: MyApp(),
     ),
   );
 }

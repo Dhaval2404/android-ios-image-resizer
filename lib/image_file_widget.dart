@@ -1,12 +1,9 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:imageresizer/app_constant.dart';
-import 'package:imageresizer/data/image_file.dart';
-import 'package:imageresizer/util/file_util.dart';
-import 'package:imageresizer/util/html_util.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:imageresizer/data/image_file.dart';
+import 'package:imageresizer/data/image_file_repo.dart';
+import 'package:imageresizer/util/file_util.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 class ImageFileWidget extends StatefulWidget {
   final ImageFile imageFile;
@@ -38,15 +35,16 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: 260, maxWidth: 260),
-                  child: Text(
-                    imageFile.fileName,
-                    maxLines: 1,
-                    style: Theme.of(context)
-                        .textTheme
-                        .subtitle2
-                        .copyWith(fontWeight: FontWeight.bold),
-                  )),
+                constraints: BoxConstraints(minWidth: 260, maxWidth: 260),
+                child: Text(
+                  imageFile.fileName,
+                  maxLines: 1,
+                  style: Theme.of(context)
+                      .textTheme
+                      .subtitle2
+                      .copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
@@ -124,6 +122,7 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
 
   uploadFile() async {
     var imageFile = widget.imageFile;
+    imageFile.progress = 0;
     if (!imageFile.android && !imageFile.iOS) {
       return;
     }
@@ -134,70 +133,8 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
       });
     }
 
-    // await dummyGetCall();
-    // await uploadFileWithDefault(imageFile);
-    await uploadFileWithDio(imageFile);
-  }
-
-  Future uploadFileWithDio(ImageFile imageFile) async {
-    String fileName = imageFile.fileName;
-    List<int> fileBytes = imageFile.fileBytes;
-
-    Dio dio = new Dio();
-    var response = await dio.post(
-      AppConstant.IMAGE_RESIZER_URL,
-      options: Options(responseType: ResponseType.bytes),
-      data: FormData.fromMap({
-        "android": imageFile.android,
-        "ios": imageFile.iOS,
-        "file": MultipartFile.fromBytes(fileBytes, filename: fileName),
-      }),
-      onSendProgress: (int sent, int total) {
-        setState(() {
-          imageFile.progress = ((sent * 100) / total).floor();
-        });
-      },
-    );
-
-    setState(() {
-      imageFile.status = ImageFileStatus.FINISH;
+    imageFileRepo.uploadFileWithDio(imageFile, () {
+      setState(() {});
     });
-
-    if (response.data != null) {
-      HtmlUtil.saveFile(fileName, response.data);
-    }
-  }
-
-  Future uploadFileWithDefault(ImageFile imageFile) async {
-    String fileName = imageFile.fileName;
-    List<int> fileBytes = imageFile.fileBytes;
-
-    var uri = Uri.parse(AppConstant.IMAGE_RESIZER_URL);
-    var request = new http.MultipartRequest("POST", uri);
-
-    var file =
-        http.MultipartFile.fromBytes('file', fileBytes, filename: fileName);
-    request.fields["android"] = imageFile.android.toString();
-    request.fields["iso"] = imageFile.iOS.toString();
-    request.files.add(file);
-
-    var streamedResponse = await request.send();
-    var response = await http.Response.fromStream(streamedResponse);
-
-    setState(() {
-      imageFile.progress = 100;
-      imageFile.status = ImageFileStatus.FINISH;
-    });
-
-    if (response.bodyBytes != null) {
-      HtmlUtil.saveFile(fileName, response.bodyBytes);
-    }
-  }
-
-  Future dummyGetCall() async {
-    String url = AppConstant.IMAGE_RESIZER_URL;
-    print("Url:" + url);
-    var value = await http.get(url);
-    print("Response:" + value.body);
   }
 }
