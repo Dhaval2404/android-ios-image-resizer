@@ -41,6 +41,8 @@ dependencies:
     sdk: flutter
   intl: ^0.16.0
   characters: ^1.0.0
+  firebase_core: ^0.4.0+9
+  firebase_analytics: ^5.0.16
 
 dev_dependencies:
   flutter_test:
