@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:imageresizer/data/image_file.dart';
 import 'package:imageresizer/data/image_file_repo.dart';
 import 'package:imageresizer/util/file_util.dart';
+import 'package:imageresizer/util/firebase_analytics_util.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 class ImageFileWidget extends StatefulWidget {
@@ -122,6 +123,12 @@ class _ImageFileWidgetState extends State<ImageFileWidget> {
 
   uploadFile() async {
     var imageFile = widget.imageFile;
+
+    FirebaseAnalyticsUtil.logEvent(name: "Upload File", parameters: {
+      "android": imageFile.android,
+      "ios": imageFile.iOS,
+    });
+
     imageFile.progress = 0;
     if (!imageFile.android && !imageFile.iOS) {
       return;

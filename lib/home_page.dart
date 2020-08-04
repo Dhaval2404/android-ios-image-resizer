@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:imageresizer/util/firebase_analytics_util.dart';
 import 'package:imageresizer/util/html_util.dart';
 
 import 'app_constant.dart';
@@ -15,7 +16,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Widget> _actions() {
@@ -110,17 +110,25 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _pickImageClick() async {
+    FirebaseAnalyticsUtil.logEvent(name: "Pick Image");
     var imageFile = await HtmlUtil.pickImage();
     if (imageFile != null) {
       if (!imageFile.fileName.endsWith("png") &&
           !imageFile.fileName.endsWith("jpg") &&
           !imageFile.fileName.endsWith("jpeg") &&
           !imageFile.fileName.endsWith("jfif")) {
-
         print(imageFile.fileName);
-        final snackBar = SnackBar(content: Text('Only PNG and JPG images are supported!'));
+        final snackBar =
+            SnackBar(content: Text('Only PNG and JPG images are supported!'));
         _scaffoldKey.currentState.showSnackBar(snackBar);
 
+        return;
+      }
+
+      if (imageFile.fileBytes.length > 1000) {
+        print(imageFile.fileName);
+        final snackBar = SnackBar(content: Text('Maximum upload size in 5MB!'));
+        _scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
 

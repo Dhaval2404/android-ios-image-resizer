@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:imageresizer/util/firebase_analytics_util.dart';
 import 'home_page.dart';
 
 void main() {
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    FirebaseAnalyticsUtil.logAppOpen();
     return MaterialApp(
       title: 'Image Resizer',
       localizationsDelegates: context.localizationDelegates,
@@ -28,6 +30,9 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(),
+      navigatorObservers: [
+        FirebaseAnalyticsUtil.getObserver(),
+      ],
     );
   }
 }
