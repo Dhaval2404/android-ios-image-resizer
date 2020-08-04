@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Image resizer app">
+  <meta name="description" content="Image Resizer App">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,6 +13,8 @@
 
   <!-- Favicon -->
   <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+  <!-- STEP 3: ADD YOUR CLIENT ID -->
+  <meta name="google-signin-client_id" content="ADD-HERE.apps.googleusercontent.com">
 
   <title>imageresizer</title>
   <link rel="manifest" href="manifest.json">
@@ -21,6 +23,33 @@
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
+
+  <!-- STEP 1: ADD Firebase JS SDK -->
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>
+
+  <!-- https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-analytics.js"></script>
+
+  <!-- STEP 2: Initialize Firebase with configuration -->
+  <script>
+    // Your web app's Firebase configuration
+    // TODO ADD YOUR FIREBASE CONFIG
+    var firebaseConfig = {
+        apiKey: "AIzaSyDE807iFsoK7x9N6k7LV8K-Nmb49V0M4VY",
+        authDomain: "android-ios-image-resizer.firebaseapp.com",
+        databaseURL: "https://android-ios-image-resizer.firebaseio.com",
+        projectId: "android-ios-image-resizer",
+        storageBucket: "android-ios-image-resizer.appspot.com",
+        messagingSenderId: "841383267463",
+        appId: "1:841383267463:web:7490fec976adaf700bfc22",
+        measurementId: "G-ZXGDPEGXDN"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+  </script>
+
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
