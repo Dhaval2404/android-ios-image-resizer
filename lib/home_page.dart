@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:imageresizer/util/file_util.dart';
 import 'package:imageresizer/util/firebase_analytics_util.dart';
 import 'package:imageresizer/util/html_util.dart';
 
@@ -125,9 +126,10 @@ class _MyHomePageState extends State<MyHomePage> {
         return;
       }
 
-      if (imageFile.fileBytes.length > 1000) {
+      if (FileUtil.getFileSizeInMB(imageFile.fileBytes.length) > 3.5) {
         print(imageFile.fileName);
-        final snackBar = SnackBar(content: Text('Maximum upload size in 5MB!'));
+        final snackBar =
+            SnackBar(content: Text('Maximum upload size in 3.5MB!'));
         _scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }

@@ -1,5 +1,10 @@
 class FileUtil {
-  
+
+  static double getFileSizeInMB(dynamic size) {
+    int divider = 1024;
+    return size / (divider * divider);
+  }
+
   static String getFileSize(dynamic size, [int round = 2]) {
     /**
      * [size] can be passed as number or as string
@@ -63,5 +68,4 @@ class FileUtil {
       return "${r.toStringAsFixed(round)} PB";
     }
   }
-
 }
