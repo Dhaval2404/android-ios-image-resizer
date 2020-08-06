@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:imageresizer/util/file_util.dart';
 import 'package:imageresizer/util/firebase_analytics_util.dart';
 import 'package:imageresizer/util/html_util.dart';
 
@@ -112,31 +111,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _pickImageClick() async {
     FirebaseAnalyticsUtil.logEvent(name: "Pick Image");
-    var imageFile = await HtmlUtil.pickImage();
-    if (imageFile != null) {
-      if (!imageFile.fileName.endsWith("png") &&
-          !imageFile.fileName.endsWith("jpg") &&
-          !imageFile.fileName.endsWith("jpeg") &&
-          !imageFile.fileName.endsWith("jfif")) {
-        print(imageFile.fileName);
-        final snackBar =
-            SnackBar(content: Text('Only PNG and JPG images are supported!'));
-        _scaffoldKey.currentState.showSnackBar(snackBar);
-
-        return;
+    try {
+      var imageFile = await HtmlUtil.pickImage();
+      if (imageFile != null) {
+        setState(() {
+          IMAGE_FILES.add(imageFile);
+        });
       }
-
-      if (FileUtil.getFileSizeInMB(imageFile.fileBytes.length) > 3.5) {
-        print(imageFile.fileName);
-        final snackBar =
-            SnackBar(content: Text('Maximum upload size in 3.5MB!'));
-        _scaffoldKey.currentState.showSnackBar(snackBar);
-        return;
-      }
-
-      setState(() {
-        IMAGE_FILES.add(imageFile);
-      });
+    } on FormatException catch (ex) {
+      print("Error");
+      final snackBar = SnackBar(content: Text(ex.message));
+      _scaffoldKey.currentState.showSnackBar(snackBar);
     }
   }
 }

@@ -2,20 +2,24 @@ import 'dart:html' as html;
 
 import 'package:image_picker_web/image_picker_web.dart';
 import 'package:imageresizer/data/image_file.dart';
-import 'package:mime_type/mime_type.dart';
-import 'package:path/path.dart' as Path;
+import 'package:imageresizer/util/file_util.dart';
 
 class HtmlUtil {
-
   static Future<ImageFile> pickImage() async {
     var mediaData = await ImagePickerWeb.getImageInfo;
-    String mimeType = mime(Path.basename(mediaData.fileName));
-    html.File mediaFile =
-        new html.File(mediaData.data, mediaData.fileName, {'type': mimeType});
 
-    if (mediaFile != null) {
-      print(mediaFile.name);
-      return ImageFile(List.from(mediaData.data), fileName: mediaFile.name);
+    if (mediaData != null) {
+      var fileName = mediaData.fileName;
+      if (FileUtil.getFileSizeInMB(mediaData.data.length) > 3.5) {
+        throw FormatException("Maximum upload size in 3.5MB!");
+      } else if (!fileName.endsWith("png") &&
+          !fileName.endsWith("jpg") &&
+          !fileName.endsWith("jpeg") &&
+          !fileName.endsWith("jfif")) {
+        throw FormatException("Only PNG and JPG images are supported!");
+      } else {
+        return ImageFile(List.from(mediaData.data), fileName: fileName);
+      }
     }
     return null;
   }
